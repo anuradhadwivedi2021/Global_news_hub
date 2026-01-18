@@ -41,6 +41,31 @@
             opacity: 0.9;
         }
 
+        .api-notice {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 25px;
+            border-radius: 10px;
+            margin: 20px auto;
+            max-width: 800px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .api-notice h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .api-notice p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .api-notice a {
+            color: #667eea;
+            font-weight: bold;
+        }
+
         .search-container {
             max-width: 600px;
             margin: 0 auto 30px;
@@ -186,23 +211,6 @@
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
 
-        .loading {
-            text-align: center;
-            color: white;
-            font-size: 1.5em;
-            margin: 50px 0;
-        }
-
-        .error-message {
-            background: rgba(255, 255, 255, 0.9);
-            color: #d32f2f;
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
-            margin: 20px 0;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -225,21 +233,6 @@
             }
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .spinner {
-            border: 5px solid rgba(255, 255, 255, 0.3);
-            border-top: 5px solid white;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 50px auto;
-        }
-
         @media (max-width: 768px) {
             h1 {
                 font-size: 2em;
@@ -259,53 +252,127 @@
     <div class="container">
         <header>
             <h1>🌍 Global News Hub</h1>
-            <p class="tagline">Real-time news powered by NewsAPI</p>
+            <p class="tagline">Your window to the world</p>
         </header>
 
+        <div class="api-notice">
+            <h3>📢 Demo Version</h3>
+            <p>This is a demo with sample news data. To use live NewsAPI:<br>
+            <strong>1.</strong> Run this HTML file on a <strong>local server</strong> (not directly in browser)<br>
+            <strong>2.</strong> Or deploy with a backend (Node.js/Python) that makes API calls<br>
+            <strong>3.</strong> Learn more at <a href="https://newsapi.org/docs" target="_blank">NewsAPI Documentation</a></p>
+        </div>
+
         <div class="search-container">
-            <input type="text" class="search-input" id="searchInput" placeholder="Search news... (e.g., technology, sports, bitcoin)" value="tesla">
+            <input type="text" class="search-input" id="searchInput" placeholder="Search news... (e.g., technology, sports, bitcoin)">
             <button class="search-btn" onclick="searchNews()">Search</button>
         </div>
 
         <div class="filter-buttons">
-            <button class="filter-btn active" onclick="loadCategory('general')">General</button>
-            <button class="filter-btn" onclick="loadCategory('technology')">Technology</button>
-            <button class="filter-btn" onclick="loadCategory('business')">Business</button>
-            <button class="filter-btn" onclick="loadCategory('sports')">Sports</button>
-            <button class="filter-btn" onclick="loadCategory('entertainment')">Entertainment</button>
+            <button class="filter-btn active" onclick="filterNews('all')">All</button>
+            <button class="filter-btn" onclick="filterNews('technology')">Technology</button>
+            <button class="filter-btn" onclick="filterNews('business')">Business</button>
+            <button class="filter-btn" onclick="filterNews('sports')">Sports</button>
+            <button class="filter-btn" onclick="filterNews('entertainment')">Entertainment</button>
         </div>
 
-        <div id="loadingIndicator" class="loading" style="display: none;">
-            <div class="spinner"></div>
-            <p>Loading news...</p>
-        </div>
-
-        <div id="errorMessage"></div>
         <div class="news-grid" id="newsGrid"></div>
     </div>
 
     <script>
-        const API_KEY = '7a1dbc85b2054edfadcad3f91178859a';
-        const API_BASE_URL = 'http://newsapi.org/v2';
+        // Sample news data (replace with API calls when running on localhost)
+        const sampleNews = {
+            technology: [
+                {
+                    source: 'TechCrunch',
+                    title: 'AI Revolution: New Language Models Transform Industries',
+                    description: 'Latest artificial intelligence breakthroughs are reshaping how businesses operate, with new language models offering unprecedented capabilities in automation and analysis.',
+                    image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=200&fit=crop',
+                    url: 'https://techcrunch.com',
+                    publishedAt: '2026-01-18T10:00:00Z'
+                },
+                {
+                    source: 'The Verge',
+                    title: 'Quantum Computing Breakthrough Announced by Tech Giants',
+                    description: 'Major technology companies unveil significant advances in quantum computing, bringing practical applications closer to reality.',
+                    image: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400&h=200&fit=crop',
+                    url: 'https://theverge.com',
+                    publishedAt: '2026-01-18T08:30:00Z'
+                },
+                {
+                    source: 'Wired',
+                    title: 'Next-Generation Smartphones Feature Revolutionary Battery Tech',
+                    description: 'New battery technology promises week-long smartphone usage on a single charge, marking a major milestone in mobile innovation.',
+                    image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=200&fit=crop',
+                    url: 'https://wired.com',
+                    publishedAt: '2026-01-17T15:20:00Z'
+                }
+            ],
+            business: [
+                {
+                    source: 'Bloomberg',
+                    title: 'Global Markets Rally on Positive Economic Indicators',
+                    description: 'Stock markets worldwide surge as investors respond enthusiastically to strong economic data and corporate earnings reports.',
+                    image: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=200&fit=crop',
+                    url: 'https://bloomberg.com',
+                    publishedAt: '2026-01-18T09:00:00Z'
+                },
+                {
+                    source: 'Financial Times',
+                    title: 'Tech Sector Leads Investment Growth in 2026',
+                    description: 'Technology companies continue to dominate investment portfolios as digital transformation accelerates across all sectors.',
+                    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=200&fit=crop',
+                    url: 'https://ft.com',
+                    publishedAt: '2026-01-17T14:45:00Z'
+                }
+            ],
+            sports: [
+                {
+                    source: 'ESPN',
+                    title: 'Champions League: Dramatic Comeback in Quarter-Finals',
+                    description: 'An incredible second-half performance leads to one of the most memorable Champions League matches in recent history.',
+                    image: 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=400&h=200&fit=crop',
+                    url: 'https://espn.com',
+                    publishedAt: '2026-01-18T11:30:00Z'
+                },
+                {
+                    source: 'Sports Illustrated',
+                    title: 'NBA All-Star Game Rosters Announced',
+                    description: 'The league reveals this year\'s All-Star selections with several surprising first-time participants making the cut.',
+                    image: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=400&h=200&fit=crop',
+                    url: 'https://si.com',
+                    publishedAt: '2026-01-17T16:00:00Z'
+                }
+            ],
+            entertainment: [
+                {
+                    source: 'Variety',
+                    title: 'Blockbuster Film Breaks Opening Weekend Records',
+                    description: 'The latest superhero movie shatters box office records with a stunning opening weekend performance worldwide.',
+                    image: 'https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=400&h=200&fit=crop',
+                    url: 'https://variety.com',
+                    publishedAt: '2026-01-18T07:15:00Z'
+                },
+                {
+                    source: 'Hollywood Reporter',
+                    title: 'Streaming Wars: New Platform Launches with Exclusive Content',
+                    description: 'A major entertainment company unveils its streaming service with unprecedented exclusive content deals.',
+                    image: 'https://images.unsplash.com/photo-1574267432644-f02f6ab926d3?w=400&h=200&fit=crop',
+                    url: 'https://hollywoodreporter.com',
+                    publishedAt: '2026-01-17T13:20:00Z'
+                }
+            ]
+        };
 
-        function showLoading() {
-            document.getElementById('loadingIndicator').style.display = 'block';
-            document.getElementById('newsGrid').innerHTML = '';
-            document.getElementById('errorMessage').innerHTML = '';
-        }
+        let allNews = [];
+        let currentFilter = 'all';
 
-        function hideLoading() {
-            document.getElementById('loadingIndicator').style.display = 'none';
-        }
-
-        function showError(message) {
-            document.getElementById('errorMessage').innerHTML = `
-                <div class="error-message">
-                    <h3>⚠️ Error</h3>
-                    <p>${message}</p>
-                </div>
-            `;
-        }
+        // Combine all news
+        Object.keys(sampleNews).forEach(category => {
+            sampleNews[category].forEach(article => {
+                allNews.push({...article, category});
+            });
+        });
 
         function formatDate(dateString) {
             const date = new Date(dateString);
@@ -324,26 +391,17 @@
             const newsGrid = document.getElementById('newsGrid');
             newsGrid.innerHTML = '';
 
-            if (!articles || articles.length === 0) {
-                showError('No news articles found. Try a different search term.');
-                return;
-            }
-
             articles.forEach((article, index) => {
-                if (!article.title || article.title === '[Removed]') return;
-
                 const card = document.createElement('div');
                 card.className = 'news-card';
                 card.style.animationDelay = `${index * 0.1}s`;
                 
-                const imageUrl = article.urlToImage || 'http://via.placeholder.com/400x200/667eea/ffffff?text=No+Image';
-                
                 card.innerHTML = `
-                    ${article.urlToImage ? `<img src="${imageUrl}" alt="${article.title}" class="news-image" onerror="this.src='https://via.placeholder.com/400x200/667eea/ffffff?text=No+Image'">` : '<div class="news-image"></div>'}
+                    <img src="${article.image}" alt="${article.title}" class="news-image" onerror="this.style.background='linear-gradient(135deg, #667eea, #764ba2)'">
                     <div class="news-content">
-                        <div class="news-source">${article.source.name || 'Unknown Source'}</div>
+                        <div class="news-source">${article.source}</div>
                         <h3 class="news-title">${article.title}</h3>
-                        <p class="news-description">${article.description || 'No description available.'}</p>
+                        <p class="news-description">${article.description}</p>
                         <div class="news-meta">
                             <span>${formatDate(article.publishedAt)}</span>
                             <a href="${article.url}" target="_blank" class="read-more">Read More</a>
@@ -355,63 +413,37 @@
             });
         }
 
-        async function searchNews() {
-            const query = document.getElementById('searchInput').value.trim();
+        function searchNews() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
             
             if (!query) {
-                showError('Please enter a search term');
+                displayNews(allNews);
                 return;
             }
 
-            showLoading();
+            const filtered = allNews.filter(article => 
+                article.title.toLowerCase().includes(query) ||
+                article.description.toLowerCase().includes(query) ||
+                article.category.toLowerCase().includes(query)
+            );
 
-            try {
-                const response = await fetch(
-                    `${API_BASE_URL}/everything?q=${encodeURIComponent(query)}&sortBy=publishedAt&apiKey=${API_KEY}&pageSize=20`
-                );
-
-                const data = await response.json();
-
-                hideLoading();
-
-                if (data.status === 'ok') {
-                    displayNews(data.articles);
-                } else {
-                    showError(data.message || 'Failed to fetch news');
-                }
-            } catch (error) {
-                hideLoading();
-                showError('Failed to connect to NewsAPI. Please check your internet connection.');
-                console.error('Error:', error);
-            }
+            displayNews(filtered);
         }
 
-        async function loadCategory(category) {
+        function filterNews(category) {
+            currentFilter = category;
+            
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
+            
             event.target.classList.add('active');
 
-            showLoading();
-
-            try {
-                const response = await fetch(
-                    `${API_BASE_URL}/top-headlines?category=${category}&apiKey=${API_KEY}&pageSize=20`
-                );
-
-                const data = await response.json();
-
-                hideLoading();
-
-                if (data.status === 'ok') {
-                    displayNews(data.articles);
-                } else {
-                    showError(data.message || 'Failed to fetch news');
-                }
-            } catch (error) {
-                hideLoading();
-                showError('Failed to connect to NewsAPI. Please check your internet connection.');
-                console.error('Error:', error);
+            if (category === 'all') {
+                displayNews(allNews);
+            } else {
+                const filtered = allNews.filter(article => article.category === category);
+                displayNews(filtered);
             }
         }
 
@@ -422,9 +454,9 @@
             }
         });
 
-        // Load Tesla news on page load
+        // Load all news on page load
         window.addEventListener('load', () => {
-            searchNews();
+            displayNews(allNews);
         });
     </script>
 </body>
