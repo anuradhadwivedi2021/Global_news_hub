@@ -336,7 +336,7 @@
                 card.className = 'news-card';
                 card.style.animationDelay = `${index * 0.1}s`;
                 
-                const imageUrl = article.urlToImage || 'https://via.placeholder.com/400x200/667eea/ffffff?text=No+Image';
+                const imageUrl = article.urlToImage || 'http://via.placeholder.com/400x200/667eea/ffffff?text=No+Image';
                 
                 card.innerHTML = `
                     ${article.urlToImage ? `<img src="${imageUrl}" alt="${article.title}" class="news-image" onerror="this.src='https://via.placeholder.com/400x200/667eea/ffffff?text=No+Image'">` : '<div class="news-image"></div>'}
