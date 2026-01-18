@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global News Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            animation: fadeIn 0.8s ease-in;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .tagline {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .search-container {
+            max-width: 600px;
+            margin: 0 auto 30px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 30px;
+            font-size: 1em;
+            outline: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .search-btn {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 15px 35px;
+            border-radius: 30px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px rgba(0,0,0,0.3);
+        }
+
+        .filter-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid white;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: white;
+            color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .news-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            animation: slideUp 0.5s ease-out;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .news-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .news-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .news-content {
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .news-source {
+            color: #667eea;
+            font-weight: bold;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .news-title {
+            font-size: 1.3em;
+            margin-bottom: 12px;
+            color: #333;
+            line-height: 1.4;
+        }
+
+        .news-description {
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.6;
+            flex: 1;
+        }
+
+        .news-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+            font-size: 0.9em;
+            color: #999;
+        }
+
+        .read-more {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .read-more:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .loading {
+            text-align: center;
+            color: white;
+            font-size: 1.5em;
+            margin: 50px 0;
+        }
+
+        .error-message {
+            background: rgba(255, 255, 255, 0.9);
+            color: #d32f2f;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .spinner {
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-top: 5px solid white;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 50px auto;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+            
+            .news-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .search-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌍 Global News Hub</h1>
+            <p class="tagline">Real-time news powered by NewsAPI</p>
+        </header>
+
+        <div class="search-container">
+            <input type="text" class="search-input" id="searchInput" placeholder="Search news... (e.g., technology, sports, bitcoin)" value="tesla">
+            <button class="search-btn" onclick="searchNews()">Search</button>
+        </div>
+
+        <div class="filter-buttons">
+            <button class="filter-btn active" onclick="loadCategory('general')">General</button>
+            <button class="filter-btn" onclick="loadCategory('technology')">Technology</button>
+            <button class="filter-btn" onclick="loadCategory('business')">Business</button>
+            <button class="filter-btn" onclick="loadCategory('sports')">Sports</button>
+            <button class="filter-btn" onclick="loadCategory('entertainment')">Entertainment</button>
+        </div>
+
+        <div id="loadingIndicator" class="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>Loading news...</p>
+        </div>
+
+        <div id="errorMessage"></div>
+        <div class="news-grid" id="newsGrid"></div>
+    </div>
+
+    <script>
+        const API_KEY = '7a1dbc85b2054edfadcad3f91178859a';
+        const API_BASE_URL = 'https://newsapi.org/v2';
+
+        function showLoading() {
+            document.getElementById('loadingIndicator').style.display = 'block';
+            document.getElementById('newsGrid').innerHTML = '';
+            document.getElementById('errorMessage').innerHTML = '';
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingIndicator').style.display = 'none';
+        }
+
+        function showError(message) {
+            document.getElementById('errorMessage').innerHTML = `
+                <div class="error-message">
+                    <h3>⚠️ Error</h3>
+                    <p>${message}</p>
+                </div>
+            `;
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+            if (diffHours < 1) return 'Just now';
+            if (diffHours < 24) return `${diffHours} hours ago`;
+            if (diffDays < 7) return `${diffDays} days ago`;
+            return date.toLocaleDateString();
+        }
+
+        function displayNews(articles) {
+            const newsGrid = document.getElementById('newsGrid');
+            newsGrid.innerHTML = '';
+
+            if (!articles || articles.length === 0) {
+                showError('No news articles found. Try a different search term.');
+                return;
+            }
+
+            articles.forEach((article, index) => {
+                if (!article.title || article.title === '[Removed]') return;
+
+                const card = document.createElement('div');
+                card.className = 'news-card';
+                card.style.animationDelay = `${index * 0.1}s`;
+                
+                const imageUrl = article.urlToImage || 'https://via.placeholder.com/400x200/667eea/ffffff?text=No+Image';
+                
+                card.innerHTML = `
+                    ${article.urlToImage ? `<img src="${imageUrl}" alt="${article.title}" class="news-image" onerror="this.src='https://via.placeholder.com/400x200/667eea/ffffff?text=No+Image'">` : '<div class="news-image"></div>'}
+                    <div class="news-content">
+                        <div class="news-source">${article.source.name || 'Unknown Source'}</div>
+                        <h3 class="news-title">${article.title}</h3>
+                        <p class="news-description">${article.description || 'No description available.'}</p>
+                        <div class="news-meta">
+                            <span>${formatDate(article.publishedAt)}</span>
+                            <a href="${article.url}" target="_blank" class="read-more">Read More</a>
+                        </div>
+                    </div>
+                `;
+                
+                newsGrid.appendChild(card);
+            });
+        }
+
+        async function searchNews() {
+            const query = document.getElementById('searchInput').value.trim();
+            
+            if (!query) {
+                showError('Please enter a search term');
+                return;
+            }
+
+            showLoading();
+
+            try {
+                const response = await fetch(
+                    `${API_BASE_URL}/everything?q=${encodeURIComponent(query)}&sortBy=publishedAt&apiKey=${API_KEY}&pageSize=20`
+                );
+
+                const data = await response.json();
+
+                hideLoading();
+
+                if (data.status === 'ok') {
+                    displayNews(data.articles);
+                } else {
+                    showError(data.message || 'Failed to fetch news');
+                }
+            } catch (error) {
+                hideLoading();
+                showError('Failed to connect to NewsAPI. Please check your internet connection.');
+                console.error('Error:', error);
+            }
+        }
+
+        async function loadCategory(category) {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            showLoading();
+
+            try {
+                const response = await fetch(
+                    `${API_BASE_URL}/top-headlines?category=${category}&apiKey=${API_KEY}&pageSize=20`
+                );
+
+                const data = await response.json();
+
+                hideLoading();
+
+                if (data.status === 'ok') {
+                    displayNews(data.articles);
+                } else {
+                    showError(data.message || 'Failed to fetch news');
+                }
+            } catch (error) {
+                hideLoading();
+                showError('Failed to connect to NewsAPI. Please check your internet connection.');
+                console.error('Error:', error);
+            }
+        }
+
+        // Allow Enter key to search
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchNews();
+            }
+        });
+
+        // Load Tesla news on page load
+        window.addEventListener('load', () => {
+            searchNews();
+        });
+    </script>
+</body>
+</html>
